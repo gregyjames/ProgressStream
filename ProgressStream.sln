@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressStream", "ProgressStream\ProgressStream.csproj", "{0B0808C6-7749-4E71-AD43-AC3431C6BF37}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamTester", "StreamTester\StreamTester.csproj", "{DB39882B-B224-4179-A97C-63E09DAB672C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{0B0808C6-7749-4E71-AD43-AC3431C6BF37}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B0808C6-7749-4E71-AD43-AC3431C6BF37}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B0808C6-7749-4E71-AD43-AC3431C6BF37}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DB39882B-B224-4179-A97C-63E09DAB672C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB39882B-B224-4179-A97C-63E09DAB672C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB39882B-B224-4179-A97C-63E09DAB672C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB39882B-B224-4179-A97C-63E09DAB672C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

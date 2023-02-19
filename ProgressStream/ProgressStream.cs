@@ -25,19 +25,35 @@ public class ProgressStream: Stream
 
     public override int Read(byte[] buffer, int offset, int count)
     {
-        int bytesRead = _innerStream.Read(buffer, offset, count);
-        _readProgress?.Report(bytesRead);
-        return bytesRead;
+        int totalBytesRead = 0;
+        while (totalBytesRead < count)
+        {
+            int bytesRead = _innerStream.Read(buffer, offset + totalBytesRead, count - totalBytesRead);
+            if (bytesRead == 0)
+            {
+                break; // end of stream
+            }
+            totalBytesRead += bytesRead;
+        }
+        _readProgress?.Report(totalBytesRead);
+        return totalBytesRead;
+    }
+    public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+    {
+        int totalBytesRead = 0;
+        while (totalBytesRead < count)
+        {
+            int bytesRead = await _innerStream.ReadAsync(buffer, offset + totalBytesRead, count - totalBytesRead, cancellationToken);
+            if (bytesRead == 0)
+            {
+                break; // end of stream
+            }
+            totalBytesRead += bytesRead;
+            _readProgress?.Report(bytesRead);
+        }
+        return totalBytesRead;
     }
 
-    public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-    {
-        return _innerStream.ReadAsync(buffer, offset, count, cancellationToken).ContinueWith(task =>
-        {
-            _readProgress?.Report(task.Result);
-            return task.Result;
-        }, cancellationToken);
-    }
 
     public override long Seek(long offset, SeekOrigin origin)
     {
