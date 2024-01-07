@@ -1,6 +1,7 @@
 ![Nuget](https://img.shields.io/nuget/dt/ProgressStream?style=flat-square)
 ![Nuget](https://img.shields.io/nuget/v/ProgressStream?style=flat-square)
 ![GitHub](https://img.shields.io/github/license/gregyjames/ProgressStream?style=flat-square)
+[![.NET](https://github.com/gregyjames/ProgressStream/actions/workflows/dotnet.yml/badge.svg)](https://github.com/gregyjames/ProgressStream/actions/workflows/dotnet.yml)
 
 # ProgressStream
 Memory Efficient C# Streams that return progress. Ever wish you could track the progress as you write or read from a stream? Well, this is the library for you!
