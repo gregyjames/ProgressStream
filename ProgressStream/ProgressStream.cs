@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,12 @@ public class ProgressStream: Stream
     private readonly IProgress<int>? _readProgress;
     private readonly IProgress<int>? _writeProgress;
 
+    /// <summary>
+    /// The wrapper for a stream that provides progress.
+    /// </summary>
+    /// <param name="stream">The underlying stream that is being written to or read from.</param>
+    /// <param name="readProgress">IProgress for read progress.</param>
+    /// <param name="writeProgress">IProgress for write progress.</param>
     public ProgressStream(Stream stream, IProgress<int>? readProgress = null, IProgress<int>? writeProgress = null)
     {
         _innerStream = stream;

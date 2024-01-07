@@ -10,7 +10,7 @@
         <Description>Memory Efficient C# Streams that return progress.</Description>
         <Copyright>Greg James @ 2023</Copyright>
         <PackageProjectUrl>https://github.com/gregyjames/ProgressStream</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/gregyjames/ProgressStream</RepositoryUrl>
+        <RepositoryUrl>https://github.com/gregyjames/ProgressStream.git</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <PackageTags>c#, streams, memory, progress, fast</PackageTags>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -19,10 +19,12 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
         <Version>1.1.0</Version>
+        <PackageIcon>Simpleicons-Team-Simple-Progress.256.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="docs\README.md" Pack="true" PackagePath="\" />
-        <None Include="docs\LICENSE.md" Pack="true" PackagePath="\" />
+        <None Include="..\README.md" Pack="true" PackagePath="\" />
+        <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
+        <None Include="docs\Simpleicons-Team-Simple-Progress.256.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>
