@@ -20,7 +20,7 @@ public class ProgressStream: Stream
     /// <param name="writeProgress">IProgress for write progress.</param>
     public ProgressStream(Stream stream, IProgress<int>? readProgress = null, IProgress<int>? writeProgress = null)
     {
-        _innerStream = stream;
+        _innerStream = stream ?? throw new ArgumentNullException(nameof(stream));
         _readProgress = readProgress;
         _writeProgress = writeProgress;
     }
@@ -78,12 +78,10 @@ public class ProgressStream: Stream
         _writeProgress?.Report(count);
     }
 
-    public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+    public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
-        return _innerStream.WriteAsync(buffer, offset, count, cancellationToken).ContinueWith(_ =>
-        {
-            _writeProgress?.Report(count);
-        }, cancellationToken);
+        await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
+        _writeProgress?.Report(count);
     }
 
     public override bool CanRead => _innerStream.CanRead;
