@@ -25,13 +25,17 @@ public class ProgressStream: Stream
         _writeProgress = writeProgress;
     }
     
+    /// <inheritdoc />
     public override void Flush()
     {
         _innerStream.Flush();
     }
 
+    /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count)
     {
+        ValidateBufferArgs(buffer, offset, count);
+        
         int totalBytesRead = 0;
         while (totalBytesRead < count)
         {
@@ -45,8 +49,12 @@ public class ProgressStream: Stream
         _readProgress?.Report(totalBytesRead);
         return totalBytesRead;
     }
+    
+    /// <inheritdoc />
     public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
+        ValidateBufferArgs(buffer, offset, count);
+        
         int totalBytesRead = 0;
         while (totalBytesRead < count)
         {
@@ -56,44 +64,59 @@ public class ProgressStream: Stream
                 break; // end of stream
             }
             totalBytesRead += bytesRead;
-            _readProgress?.Report(bytesRead);
         }
+        _readProgress?.Report(totalBytesRead);
         return totalBytesRead;
     }
 
 
+    /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin)
     {
         return _innerStream.Seek(offset, origin);
     }
 
+    /// <inheritdoc />
     public override void SetLength(long value)
     {
         _innerStream.SetLength(value);
     }
 
+    /// <inheritdoc />
     public override void Write(byte[] buffer, int offset, int count)
     {
+        ValidateBufferArgs(buffer, offset, count);
+        
         _innerStream.Write(buffer, offset, count);
         _writeProgress?.Report(count);
     }
 
+    /// <inheritdoc />
     public override async Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
     {
+        ValidateBufferArgs(buffer, offset, count);
         await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
         _writeProgress?.Report(count);
     }
 
+    /// <inheritdoc />
     public override bool CanRead => _innerStream.CanRead;
+    
+    /// <inheritdoc />
     public override bool CanSeek => _innerStream.CanSeek;
+    
+    /// <inheritdoc />
     public override bool CanWrite => _innerStream.CanWrite;
+    /// <inheritdoc />
     public override long Length => _innerStream.Length;
+    /// <inheritdoc />
     public override long Position
     {
         get => _innerStream.Position;
         set => _innerStream.Position = value;
     }
     
+    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         if (disposing)
@@ -102,5 +125,28 @@ public class ProgressStream: Stream
         }
 
         base.Dispose(disposing);
+    }
+    
+    /// <summary>
+    /// Validates the buffer, offset, and count arguments for read/write calls.
+    /// </summary>
+    /// <param name="buffer">The buffer to read or write.</param>
+    /// <param name="offset">The offset within <paramref name="buffer"/>.</param>
+    /// <param name="count">The number of bytes to read or write.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="buffer"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="offset"/> or <paramref name="count"/> are invalid.</exception>
+    private static void ValidateBufferArgs(byte[] buffer, int offset, int count)
+    {
+        if (buffer == null)
+            throw new ArgumentNullException(nameof(buffer));
+
+        if (offset < 0)
+            throw new ArgumentOutOfRangeException(nameof(offset), "Offset cannot be negative.");
+
+        if (count < 0)
+            throw new ArgumentOutOfRangeException(nameof(count), "Count cannot be negative.");
+
+        if (offset + count > buffer.Length)
+            throw new ArgumentException("The sum of offset and count is greater than the buffer length.");
     }
 }
