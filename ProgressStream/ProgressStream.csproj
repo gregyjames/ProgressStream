@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <TargetFrameworks>net461;net472;net6.0</TargetFrameworks>
+        <TargetFrameworks>net6.0;net461;net472;net7.0;net8.0;net9.0</TargetFrameworks>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Title>ProgressStream</Title>
         <Authors>Greg James</Authors>
