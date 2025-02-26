@@ -1,8 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35806.99 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressStream", "ProgressStream\ProgressStream.csproj", "{0B0808C6-7749-4E71-AD43-AC3431C6BF37}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StreamTester", "StreamTester\StreamTester.csproj", "{DB39882B-B224-4179-A97C-63E09DAB672C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgressStream.Tests", "ProgressStream.Tests\ProgressStream.Tests.csproj", "{56526C77-48B9-4120-8929-1C6524871A4A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +23,15 @@ Global
 		{DB39882B-B224-4179-A97C-63E09DAB672C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB39882B-B224-4179-A97C-63E09DAB672C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB39882B-B224-4179-A97C-63E09DAB672C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56526C77-48B9-4120-8929-1C6524871A4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56526C77-48B9-4120-8929-1C6524871A4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56526C77-48B9-4120-8929-1C6524871A4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56526C77-48B9-4120-8929-1C6524871A4A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8229E78B-A59C-4BF8-8D07-E3EB1D6D5925}
 	EndGlobalSection
 EndGlobal
