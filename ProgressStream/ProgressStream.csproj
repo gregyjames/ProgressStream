@@ -17,14 +17,13 @@
         <LangVersion>8.0</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Version>1.1.0</Version>
         <PackageIcon>Simpleicons-Team-Simple-Progress.256.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="..\README.md" Pack="true" PackagePath="\" />
-        <None Include="..\LICENSE.md" Pack="true" PackagePath="\" />
         <None Include="docs\Simpleicons-Team-Simple-Progress.256.png" Pack="true" PackagePath="\" />
     </ItemGroup>
 </Project>
