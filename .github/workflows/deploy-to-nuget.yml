@@ -16,7 +16,7 @@ jobs:
       with:
         dotnet-version: | 
           9.0.x
-    - uses: actions/cache@v2
+    - uses: actions/cache@v6
       id: cacheStep
       with:
         path: ~/.nuget/packages
