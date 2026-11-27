@@ -8,25 +8,25 @@
 Memory Efficient C# Streams that return progress. Ever wish you could track the progress as you write or read from a stream? Well, this is the library for you!
 
 ## Sample Usage
-    var bytesReadOverall = 0;  
-    var readProgress = new Progress<int>(bytesRead =>  
-    {  
-        Console.WriteLine($"{bytesReadOverall}/10485760 -> {Convert.ToDecimal(bytesReadOverall/10485760.0):P}");  
-    });  
-    await using var stream = new ProgressStream.ProgressStream(content.ReadAsStreamAsync().Result, readProgress);  
-    await using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);  
-    while (true)  
-    {  
-        var bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);  
-        if (bytesRead == 0)  
-        {  
-            break;  
-        }  
-        fileStream.Write(buffer,0, bytesRead);  
-        bytesReadOverall += bytesRead;  
-    }  
-      
-    Console.WriteLine("Downloaded file: " + fileName);
+```csharp
+var readProgress = new Progress<ProgressStream.StreamProgress>(progress =>
+{
+    var pct = progress.Percentage is double p ? $"{p:F1}%" : "N/A";
+    Console.WriteLine($"{progress.TotalBytesTransferred}/{progress.TotalLength?.ToString() ?? "?"} -> {pct}");
+});
+
+await using var stream = new ProgressStream.ProgressStream(
+    await content.ReadAsStreamAsync(),
+    readProgress,
+    totalLength: content.Headers.ContentLength);
+await using var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write, FileShare.None);
+
+await stream.CopyToAsync(fileStream);
+
+Console.WriteLine($"Downloaded {stream.TotalBytesRead} bytes to: {fileName}");
+```
+
+> `IProgress<int>` constructor overloads remain supported for backward compatibility, and `TotalBytesRead` / `TotalBytesWritten` (`long`) track cumulative byte counts safely past 2 GB.
 
 ## License
 MIT License
