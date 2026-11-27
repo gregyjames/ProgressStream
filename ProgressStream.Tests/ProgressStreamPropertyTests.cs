@@ -9,18 +9,18 @@ public class ProgressStreamPropertyTests
 
         await using var stream = new ProgressStream(inputStream);
 
-        Assert.Equal(inputStream.CanRead, stream.CanRead);
-        Assert.Equal(inputStream.CanSeek, stream.CanSeek);
-        Assert.Equal(inputStream.CanWrite, stream.CanWrite);
-        Assert.Equal(inputStream.Length, stream.Length);
+        stream.CanRead.Should().Be(inputStream.CanRead);
+        stream.CanSeek.Should().Be(inputStream.CanSeek);
+        stream.CanWrite.Should().Be(inputStream.CanWrite);
+        stream.Length.Should().Be(inputStream.Length);
 
         inputStream.Position = 1;
 
-        Assert.Equal(inputStream.Position, stream.Position);
+        stream.Position.Should().Be(inputStream.Position);
 
         stream.Position = 2;
 
-        Assert.Equal(inputStream.Position, stream.Position);
+        stream.Position.Should().Be(inputStream.Position);
     }
 
     [Fact]
@@ -32,8 +32,8 @@ public class ProgressStreamPropertyTests
 
         stream.Seek(5, SeekOrigin.Begin);
 
-        Assert.Equal(5, inputStream.Position);
-        Assert.Equal(5, stream.Position);
+        inputStream.Position.Should().Be(5);
+        stream.Position.Should().Be(5);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public class ProgressStreamPropertyTests
 
         stream.SetLength(5);
 
-        Assert.Equal(5, inputStream.Length);
-        Assert.Equal(5, stream.Length);
+        inputStream.Length.Should().Be(5);
+        stream.Length.Should().Be(5);
     }
 }

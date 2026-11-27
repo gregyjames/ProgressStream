@@ -34,7 +34,7 @@ public class ProgressStreamWriteTests
 
         await outputStream.FlushAsync(TestContext.Current.CancellationToken);
 
-        Assert.Equal(inputStream.Length, bytesReadOverall);
+        bytesReadOverall.Should().Be((int)inputStream.Length);
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class ProgressStreamWriteTests
             outputStream.Write(buffer, 0, bytesRead);
         }
 
-        Assert.Equal(inputStream.Length, bytesReadOverall);
+        bytesReadOverall.Should().Be((int)inputStream.Length);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class ProgressStreamWriteTests
             await outputStream.WriteAsync(buffer.AsMemory(0, bytesRead), TestContext.Current.CancellationToken);
         }
 
-        Assert.Equal(inputStream.Length, bytesReadOverall);
+        bytesReadOverall.Should().Be((int)inputStream.Length);
     }
 
     [Fact]
@@ -113,12 +113,12 @@ public class ProgressStreamWriteTests
             await stream.WriteAsync(chunk, TestContext.Current.CancellationToken);
         }
 
-        Assert.Equal(100L, stream.TotalBytesWritten);
-        Assert.Equal(0L, stream.TotalBytesRead);
-        Assert.Equal(4, reports.Count);
-        Assert.Equal(new StreamProgress(25, 25, 100), reports[0]);
-        Assert.Equal(25.0, reports[0].Percentage);
-        Assert.Equal(new StreamProgress(25, 100, 100), reports[3]);
-        Assert.Equal(100.0, reports[3].Percentage);
+        stream.TotalBytesWritten.Should().Be(100L);
+        stream.TotalBytesRead.Should().Be(0L);
+        reports.Should().HaveCount(4);
+        reports[0].Should().Be(new StreamProgress(25, 25, 100));
+        reports[0].Percentage.Should().Be(25.0);
+        reports[3].Should().Be(new StreamProgress(25, 100, 100));
+        reports[3].Percentage.Should().Be(100.0);
     }
 }

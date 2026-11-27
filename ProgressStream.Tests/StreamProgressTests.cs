@@ -34,15 +34,13 @@ public class StreamProgressTests
             await dest.WriteAsync(buffer.AsMemory(0, bytesRead), TestContext.Current.CancellationToken);
         }
 
-        Assert.Equal(totalSize, source.TotalBytesRead);
-        Assert.Equal(totalSize, dest.TotalBytesWritten);
-        Assert.True(source.TotalBytesRead > int.MaxValue);
-        Assert.True(dest.TotalBytesWritten > int.MaxValue);
+        source.TotalBytesRead.Should().Be(totalSize).And.BeGreaterThan(int.MaxValue);
+        dest.TotalBytesWritten.Should().Be(totalSize).And.BeGreaterThan(int.MaxValue);
 
-        Assert.Equal(totalSize, readReports[^1].TotalBytesTransferred);
-        Assert.Equal(100.0, readReports[^1].Percentage);
-        Assert.Equal(totalSize, writeReports[^1].TotalBytesTransferred);
-        Assert.Equal(100.0, writeReports[^1].Percentage);
+        readReports[^1].TotalBytesTransferred.Should().Be(totalSize);
+        readReports[^1].Percentage.Should().Be(100.0);
+        writeReports[^1].TotalBytesTransferred.Should().Be(totalSize);
+        writeReports[^1].Percentage.Should().Be(100.0);
     }
 
     [Fact]
@@ -53,15 +51,15 @@ public class StreamProgressTests
         var c = new StreamProgress(10, 60, 100);
         var zeroLength = new StreamProgress(0, 0, 0);
 
-        Assert.Equal(10L, a.BytesTransferred);
-        Assert.Equal(50L, a.TotalBytesTransferred);
-        Assert.Equal(100L, a.TotalLength);
-        Assert.True(a == b);
-        Assert.False(a != b);
-        Assert.True(a.Equals((object)b));
-        Assert.Equal(a.GetHashCode(), b.GetHashCode());
-        Assert.True(a != c);
-        Assert.False(a.Equals(null));
-        Assert.Null(zeroLength.Percentage);
+        a.BytesTransferred.Should().Be(10L);
+        a.TotalBytesTransferred.Should().Be(50L);
+        a.TotalLength.Should().Be(100L);
+        (a == b).Should().BeTrue();
+        (a != b).Should().BeFalse();
+        a.Equals((object)b).Should().BeTrue();
+        a.GetHashCode().Should().Be(b.GetHashCode());
+        (a != c).Should().BeTrue();
+        a.Equals(null).Should().BeFalse();
+        zeroLength.Percentage.Should().BeNull();
     }
 }

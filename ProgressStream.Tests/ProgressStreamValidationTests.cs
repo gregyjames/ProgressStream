@@ -5,13 +5,22 @@ public class ProgressStreamValidationTests
     [Fact]
     public void Constructor_InvalidArguments_ThrowExpectedExceptions()
     {
-        Assert.Throws<ArgumentNullException>(() => new ProgressStream(null!));
-        Assert.Throws<ArgumentNullException>(() => new ProgressStream(null!, (IProgress<int>?)null));
-        Assert.Throws<ArgumentNullException>(() => new ProgressStream(null!, (IProgress<StreamProgress>?)null));
+        FluentActions.Invoking(() => new ProgressStream(null!))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("stream");
+
+        FluentActions.Invoking(() => new ProgressStream(null!, (IProgress<int>?)null))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("stream");
+
+        FluentActions.Invoking(() => new ProgressStream(null!, (IProgress<StreamProgress>?)null))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("stream");
 
         using var inner = new MemoryStream();
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            new ProgressStream(inner, totalLength: -1));
+        FluentActions.Invoking(() => new ProgressStream(inner, totalLength: -1))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("totalLength");
     }
 
     [Fact]
@@ -21,14 +30,30 @@ public class ProgressStreamValidationTests
         using var stream = new ProgressStream(inner);
         var buffer = new byte[10];
 
-        Assert.Throws<ArgumentNullException>(() => stream.Read(null!, 0, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Read(buffer, -1, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Read(buffer, 0, -1));
-        Assert.Throws<ArgumentException>(() => stream.Read(buffer, 5, 6));
+        FluentActions.Invoking(() => stream.Read(null!, 0, 1))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("buffer");
+        FluentActions.Invoking(() => stream.Read(buffer, -1, 1))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("offset");
+        FluentActions.Invoking(() => stream.Read(buffer, 0, -1))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("count");
+        FluentActions.Invoking(() => stream.Read(buffer, 5, 6))
+            .Should().Throw<ArgumentException>()
+            .WithParameterName("buffer");
 
-        Assert.Throws<ArgumentNullException>(() => stream.Write(null!, 0, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Write(buffer, -1, 1));
-        Assert.Throws<ArgumentOutOfRangeException>(() => stream.Write(buffer, 0, -1));
-        Assert.Throws<ArgumentException>(() => stream.Write(buffer, 5, 6));
+        FluentActions.Invoking(() => stream.Write(null!, 0, 1))
+            .Should().Throw<ArgumentNullException>()
+            .WithParameterName("buffer");
+        FluentActions.Invoking(() => stream.Write(buffer, -1, 1))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("offset");
+        FluentActions.Invoking(() => stream.Write(buffer, 0, -1))
+            .Should().Throw<ArgumentOutOfRangeException>()
+            .WithParameterName("count");
+        FluentActions.Invoking(() => stream.Write(buffer, 5, 6))
+            .Should().Throw<ArgumentException>()
+            .WithParameterName("buffer");
     }
 }

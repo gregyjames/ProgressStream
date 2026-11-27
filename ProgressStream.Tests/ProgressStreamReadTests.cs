@@ -32,7 +32,7 @@ public class ProgressStreamReadTests
             await outputStream.WriteAsync(buffer.AsMemory(0, bytesRead), TestContext.Current.CancellationToken);
         }
 
-        Assert.Equal(inputStream.Length, bytesReadOverall);
+        bytesReadOverall.Should().Be((int)inputStream.Length);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class ProgressStreamReadTests
             await outputStream.WriteAsync(buffer.AsMemory(0, bytesRead), TestContext.Current.CancellationToken);
         }
 
-        Assert.Equal(inputStream.Length, bytesReadOverall);
+        bytesReadOverall.Should().Be((int)inputStream.Length);
     }
 
     [Fact]
@@ -75,21 +75,23 @@ public class ProgressStreamReadTests
         using var stream = new ProgressStream(inner, readProgress);
 
         var buffer = new byte[40];
-        Assert.Equal(40, stream.Read(buffer, 0, buffer.Length));
-        Assert.Equal(40, stream.Read(buffer, 0, buffer.Length));
-        Assert.Equal(20, stream.Read(buffer, 0, buffer.Length));
-        Assert.Equal(0, stream.Read(buffer, 0, buffer.Length));
+        stream.Read(buffer, 0, buffer.Length).Should().Be(40);
+        stream.Read(buffer, 0, buffer.Length).Should().Be(40);
+        stream.Read(buffer, 0, buffer.Length).Should().Be(20);
+        stream.Read(buffer, 0, buffer.Length).Should().Be(0);
 
-        Assert.Equal(100L, stream.TotalBytesRead);
-        Assert.Equal(0L, stream.TotalBytesWritten);
-        Assert.Equal(3, reports.Count);
+        stream.TotalBytesRead.Should().Be(100L);
+        stream.TotalBytesWritten.Should().Be(0L);
 
-        Assert.Equal(new StreamProgress(40, 40, 100), reports[0]);
-        Assert.Equal(40.0, reports[0].Percentage);
-        Assert.Equal(new StreamProgress(40, 80, 100), reports[1]);
-        Assert.Equal(80.0, reports[1].Percentage);
-        Assert.Equal(new StreamProgress(20, 100, 100), reports[2]);
-        Assert.Equal(100.0, reports[2].Percentage);
+        reports.Should().BeEquivalentTo([
+            new StreamProgress(40, 40, 100),
+            new StreamProgress(40, 80, 100),
+            new StreamProgress(20, 100, 100)
+        ], options => options.WithStrictOrdering());
+
+        reports[0].Percentage.Should().Be(40.0);
+        reports[1].Percentage.Should().Be(80.0);
+        reports[2].Percentage.Should().Be(100.0);
     }
 
     [Fact]
@@ -101,14 +103,14 @@ public class ProgressStreamReadTests
         await using var stream = new ProgressStream(inner, readProgress);
 
         var buffer = new byte[100];
-        Assert.Equal(100, await stream.ReadAsync(buffer, TestContext.Current.CancellationToken));
-        Assert.Equal(100, await stream.ReadAsync(buffer, TestContext.Current.CancellationToken));
+        (await stream.ReadAsync(buffer, TestContext.Current.CancellationToken)).Should().Be(100);
+        (await stream.ReadAsync(buffer, TestContext.Current.CancellationToken)).Should().Be(100);
 
-        Assert.Equal(2, reports.Count);
-        Assert.Null(reports[0].TotalLength);
-        Assert.Null(reports[0].Percentage);
-        Assert.Equal(100L, reports[0].TotalBytesTransferred);
-        Assert.Equal(200L, reports[1].TotalBytesTransferred);
+        reports.Should().HaveCount(2);
+        reports[0].TotalLength.Should().BeNull();
+        reports[0].Percentage.Should().BeNull();
+        reports[0].TotalBytesTransferred.Should().Be(100L);
+        reports[1].TotalBytesTransferred.Should().Be(200L);
     }
 
     [Theory]
@@ -125,12 +127,12 @@ public class ProgressStreamReadTests
         using var stream = new ProgressStream(inner, new UnitTestProgress<StreamProgress>(reports.Add));
 
         var buffer = new byte[10];
-        Assert.Equal(10, stream.Read(buffer, 0, buffer.Length));
+        stream.Read(buffer, 0, buffer.Length).Should().Be(10);
 
-        Assert.Single(reports);
-        Assert.Equal(10L, reports[0].BytesTransferred);
-        Assert.Equal(10L, reports[0].TotalBytesTransferred);
-        Assert.Null(reports[0].TotalLength);
-        Assert.Null(reports[0].Percentage);
+        var report = reports.Should().ContainSingle().Subject;
+        report.BytesTransferred.Should().Be(10L);
+        report.TotalBytesTransferred.Should().Be(10L);
+        report.TotalLength.Should().BeNull();
+        report.Percentage.Should().BeNull();
     }
 }
