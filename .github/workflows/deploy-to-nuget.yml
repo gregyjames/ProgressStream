@@ -10,13 +10,13 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v7
     - name: Setup .NET
       uses: actions/setup-dotnet@v6
       with:
         dotnet-version: | 
           9.0.x
-    - uses: actions/cache@v2
+    - uses: actions/cache@v6
       id: cacheStep
       with:
         path: ~/.nuget/packages
