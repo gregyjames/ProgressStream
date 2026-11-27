@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +12,20 @@ namespace ProgressStream
         private readonly Stream _innerStream;
         private readonly IProgress<int>? _readProgress;
         private readonly IProgress<int>? _writeProgress;
+        private readonly IProgress<StreamProgress>? _readStreamProgress;
+        private readonly IProgress<StreamProgress>? _writeStreamProgress;
+        private readonly long? _totalLength;
+        private long _totalBytesRead;
+        private long _totalBytesWritten;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressStream"/> class. The wrapper for a stream that tracks byte counts.
+        /// </summary>
+        /// <param name="stream">The underlying stream that is being written to or read from.</param>
+        public ProgressStream(Stream stream)
+            : this(stream, (IProgress<StreamProgress>?)null, null, null)
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ProgressStream"/> class. The wrapper for a stream that provides progress.
@@ -25,6 +39,43 @@ namespace ProgressStream
             _readProgress = readProgress;
             _writeProgress = writeProgress;
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressStream"/> class with cumulative <see cref="StreamProgress"/> reporting.
+        /// </summary>
+        /// <param name="stream">The underlying stream that is being written to or read from.</param>
+        /// <param name="readProgress">Progress reporter receiving cumulative read progress.</param>
+        /// <param name="writeProgress">Progress reporter receiving cumulative write progress.</param>
+        /// <param name="totalLength">Optional total length of the stream in bytes, useful for non-seekable streams such as HTTP responses.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="stream"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="totalLength"/> is negative.</exception>
+        public ProgressStream(
+            Stream stream,
+            IProgress<StreamProgress>? readProgress = null,
+            IProgress<StreamProgress>? writeProgress = null,
+            long? totalLength = null)
+        {
+            _innerStream = stream ?? throw new ArgumentNullException(nameof(stream));
+
+            if (totalLength < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(totalLength), "Total length cannot be negative.");
+            }
+
+            _readStreamProgress = readProgress;
+            _writeStreamProgress = writeProgress;
+            _totalLength = totalLength;
+        }
+
+        /// <summary>
+        /// Gets the cumulative number of bytes read from the stream.
+        /// </summary>
+        public long TotalBytesRead => Interlocked.Read(ref _totalBytesRead);
+
+        /// <summary>
+        /// Gets the cumulative number of bytes written to the stream.
+        /// </summary>
+        public long TotalBytesWritten => Interlocked.Read(ref _totalBytesWritten);
 
         /// <inheritdoc />
         public override void Flush()
@@ -51,7 +102,7 @@ namespace ProgressStream
                 totalBytesRead += bytesRead;
             }
 
-            _readProgress?.Report(totalBytesRead);
+            ReportRead(totalBytesRead);
 
             return totalBytesRead;
         }
@@ -80,7 +131,7 @@ namespace ProgressStream
                 totalBytesRead += bytesRead;
             }
 
-            _readProgress?.Report(totalBytesRead);
+            ReportRead(totalBytesRead);
 
             return totalBytesRead;
         }
@@ -103,7 +154,7 @@ namespace ProgressStream
             ValidateBufferArgs(buffer, offset, count);
 
             _innerStream.Write(buffer, offset, count);
-            _writeProgress?.Report(count);
+            ReportWrite(count);
         }
 
         /// <inheritdoc />
@@ -116,7 +167,7 @@ namespace ProgressStream
 #else
             await _innerStream.WriteAsync(buffer, offset, count, cancellationToken);
 #endif
-            _writeProgress?.Report(count);
+            ReportWrite(count);
         }
 
         /// <inheritdoc />
@@ -147,6 +198,51 @@ namespace ProgressStream
             }
 
             base.Dispose(disposing);
+        }
+
+        private void ReportRead(int bytesRead) =>
+            ReportProgress(bytesRead, ref _totalBytesRead, _readProgress, _readStreamProgress);
+
+        private void ReportWrite(int bytesWritten) =>
+            ReportProgress(bytesWritten, ref _totalBytesWritten, _writeProgress, _writeStreamProgress);
+
+        private void ReportProgress(
+            int bytesTransferred,
+            ref long totalBytes,
+            IProgress<int>? intProgress,
+            IProgress<StreamProgress>? streamProgress)
+        {
+            if (bytesTransferred > 0)
+            {
+                long total = Interlocked.Add(ref totalBytes, bytesTransferred);
+                intProgress?.Report(bytesTransferred);
+                streamProgress?.Report(new StreamProgress(bytesTransferred, total, ResolveTotalLength()));
+                return;
+            }
+
+            intProgress?.Report(bytesTransferred);
+        }
+
+        private long? ResolveTotalLength()
+        {
+            if (_totalLength.HasValue)
+            {
+                return _totalLength;
+            }
+
+            if (!_innerStream.CanSeek)
+            {
+                return null;
+            }
+
+            try
+            {
+                return _innerStream.Length;
+            }
+            catch (Exception ex) when (ex is NotSupportedException || ex is ObjectDisposedException)
+            {
+                return null;
+            }
         }
 
         /// <summary>

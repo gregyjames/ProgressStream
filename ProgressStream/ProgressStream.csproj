@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -14,7 +14,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>c#, streams, memory, progress, fast</PackageTags>
         <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-        <LangVersion>8.0</LangVersion>
+        <LangVersion>latest</LangVersion>
         <ImplicitUsings>disable</ImplicitUsings>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
